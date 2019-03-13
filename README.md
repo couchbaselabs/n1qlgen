@@ -18,20 +18,37 @@ Usage of ./n1qlgen:
 ```
 
 ## Kubernetes
+
+### Create cluster
+Jobs are targeted against CouchbaseCluster named `cb-example` with a bucket named `travel-sample` instead of 'default'. 
+Helm can be used to create a cluster configured to run the query load gen:
+```bash
+# add partner repo
+helm repo add couchbase https://couchbase-partners.github.io/
+
+# install operator chart
+helm install couchbase/couchbase-operator
+
+# install bucket chart with bucket named 'travel-sample'
+helm install --set couchbaseCluster.name=cb-example \ 
+             --set couchbaseCluster.buckets.default.name=travel-sample \
+             couchbase/couchbase-cluster
+```
+
+For manual cluster creation refer [Couchbase Operator deployment documentation.](https://docs.couchbase.com/operator/1.1/install-kubernetes.html)
+
+### Run query generator
 The following jobs can be run to load travel-sample data into a kuberentes cluster and run the query generator.
-
-**NOTE:** Jobs are targeted against CouchbaseCluster named 'cb-example' with a bucket named 'travel-sample' instead of 'default'. 
-
 ```bash
 cd kubernetes
 
-# create bucket user
+# create bucket user and check Couchbase Web Console -> Security for user named 'travel-sample'
 kubectl create -f user-secret.yaml
 kubectl create -f user-create.yaml
 
-# load travel-sample data
+# load travel-sample data and check Couchbase Web Console -> Buckets (travel-sample) -> statistics
 kubectl create -f data-load.yaml
 
-# run n1ql gen
+# run n1ql gen and check Couchbase Web Console -> Buckets (travel-sample)  -> statistics -> Query
 kubectl create -f n1qlgen-run.yaml
 ```
