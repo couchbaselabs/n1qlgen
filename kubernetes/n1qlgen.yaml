@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: n1qlgen
+spec:
+  template:
+    spec:
+      containers:
+      - name: n1qlgen
+        image: couchbaseutils/n1qlgen
+        command: ["/go/bin/n1qlgen", "-cluster=qcb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=10"]
+      restartPolicy: Never
