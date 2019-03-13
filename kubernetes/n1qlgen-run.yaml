@@ -8,5 +8,5 @@ spec:
       containers:
       - name: n1qlgen
         image: couchbaseutils/n1qlgen
-        command: ["/go/bin/n1qlgen", "-cluster=qcb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=10"]
+        command: ["/go/bin/n1qlgen", "-cluster=cb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=10"]
       restartPolicy: Never

@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: travel-sample 
+spec:
+  template:
+    spec:
+      containers:
+      - name: travel-sample
+        image: couchbase/server:enterprise-5.5.1
+        command: ["/opt/couchbase/bin/cbdocloader", "-c", "cb-example-0000.cb-example.default.svc", "-u", "Administrator", "-p", "password", "-b" ,"travel-sample", "-m", "100", "-d", "/opt/couchbase/samples/travel-sample.zip"]
+      restartPolicy: Never
