@@ -30,7 +30,7 @@ helm repo add couchbase https://couchbase-partners.github.io/
 helm install couchbase/couchbase-operator
 
 # install bucket chart with bucket named 'travel-sample'
-helm install --set couchbaseCluster.name=cb-example \ 
+helm install --set couchbaseCluster.name=cb-example \
              --set couchbaseCluster.buckets.default.name=travel-sample \
              couchbase/couchbase-cluster
 ```
