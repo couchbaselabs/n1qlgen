@@ -2,6 +2,12 @@
 N1gl load generator for use travel-sample data
 
 ```bash
+go build
+./n1qlgen -cluster mycluster -bucket travel-sample -password password
+```
+
+### Help
+```bash
 Usage of ./n1qlgen:
   -bucket string
         bucket with travel-sample data (default "default")
@@ -12,7 +18,7 @@ Usage of ./n1qlgen:
   -duration int
         time to apply load (in seconds) (default 60)
   -namespace string
-        namespace of couchbase cluster resource (default "default")
+        namespace/domain of couchbase cluster resource (default "default")
   -password string
         password for bucket user
 ```

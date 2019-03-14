@@ -2,14 +2,20 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/couchbase/gocb"
 )
 
 type N1qlGen struct {
-	cluster *gocb.Cluster
-	bucket  *gocb.Bucket
+	cluster    *gocb.Cluster
+	bucket     *gocb.Bucket
+	generators []Generator
+}
+
+type Generator interface {
+	query() string
 }
 
 func NewN1qlGen(clusterName, namespace, bucketName, password string) (*N1qlGen, error) {
@@ -28,15 +34,17 @@ func NewN1qlGen(clusterName, namespace, bucketName, password string) (*N1qlGen, 
 	if err != nil {
 		return nil, fmt.Errorf("Open bucket error: %v", err)
 	}
-	return &N1qlGen{cluster, bucket}, nil
+
+	queries := []Generator{NewRouteQueryGenerator(), NewHotelQueryGenerator()}
+	return &N1qlGen{cluster, bucket, queries}, nil
 }
 
-func (ng *N1qlGen) run(duration int, concurrency int) {
+func (ng *N1qlGen) run(duration, concurrency, seed int) {
 
 	for i := 0; i < concurrency; i++ {
 		// ramp up requests every 2 seconds
 		time.Sleep(time.Duration(2 * time.Second))
-		go ng.runQueries()
+		go ng.runQueries(seed)
 	}
 
 	// wait for specified duration
@@ -44,26 +52,18 @@ func (ng *N1qlGen) run(duration int, concurrency int) {
 	time.Sleep(time.Duration(duration) * time.Second)
 }
 
-func (ng *N1qlGen) runQueries() {
+func (ng *N1qlGen) runQueries(seed int) {
 	for {
-		q := ng.genQuery()
-		rows, err := ng.bucket.ExecuteN1qlQuery(q, nil)
+		// pseudo random select a query generator
+		seed += 1
+		gen := ng.generators[rand.Intn(seed)%len(ng.generators)]
+		query := gen.query()
+		fmt.Println(query)
+
+		// execute query
+		rows, err := ng.bucket.ExecuteN1qlQuery(gocb.NewN1qlQuery(query), nil)
 		if err = rows.Close(); err != nil {
 			fmt.Printf("Couldn't get all the rows: %s\n", err)
 		}
 	}
-}
-
-func (ng *N1qlGen) genQuery() *gocb.N1qlQuery {
-
-	// TODO: templating this
-	query := gocb.NewN1qlQuery("SELECT  id, sourceairport, destinationairport, " +
-		"(SELECT s.day, s.flight, str_to_tz(s.utc, 'Europe/London') as time " +
-		"FROM `travel-sample`.schedule s " +
-		"WHERE  str_to_tz(s.utc, 'Europe/London') > '18:00:00' " +
-		"ORDER BY s.utc)  after_10pm " +
-		"FROM `travel-sample` " +
-		"WHERE type = 'route' and sourceairport = 'SFO' ")
-	return query
-
 }
