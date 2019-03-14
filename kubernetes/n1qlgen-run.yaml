@@ -1,12 +1,39 @@
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: n1qlgen
+  name: n1qlgen-a
 spec:
   template:
     spec:
       containers:
       - name: n1qlgen
         image: couchbaseutils/n1qlgen
-        command: ["/go/bin/n1qlgen", "-cluster=cb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=10"]
+        command: ["/go/bin/n1qlgen", "-cluster=cb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=20"]
+      restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: n1qlgen-b
+spec:
+  template:
+    spec:
+      containers:
+      - name: n1qlgen
+        image: couchbaseutils/n1qlgen
+        command: ["/go/bin/n1qlgen", "-cluster=cb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=20", "-seed=4321"]
+      restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: n1qlgen-c
+spec:
+  template:
+    spec:
+      containers:
+      - name: n1qlgen
+        image: couchbaseutils/n1qlgen
+        command: ["/go/bin/n1qlgen", "-cluster=cb-example", "-bucket=travel-sample", "-password=password", "-duration=600", "-concurrency=20", "-seed=1122"]
       restartPolicy: Never
