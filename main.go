@@ -15,9 +15,9 @@ func main() {
 	var seed int
 
 	flag.StringVar(&clusterName, "cluster", "cb-example", "name of couchbase cluster resource")
-	flag.StringVar(&namespace, "namespace", "default", "namespace/domain of couchbase cluster resource")
-	flag.StringVar(&bucketName, "bucket", "default", "bucket with travel-sample data")
-	flag.StringVar(&password, "password", "", "password for bucket user")
+	flag.StringVar(&namespace, "namespace", "default", "namespace of couchbase cluster resource")
+	flag.StringVar(&bucketName, "bucket", "travel-sample", "bucket with travel-sample data")
+	flag.StringVar(&password, "password", "password", "password for bucket user")
 	flag.IntVar(&duration, "duration", 60, "time to apply load (in seconds)")
 	flag.IntVar(&concurrency, "concurrency", 5, "number of concurrent requests")
 	flag.IntVar(&seed, "seed", 1234, "seed determining query randomness")
