@@ -10,17 +10,19 @@ go build
 ```bash
 Usage of ./n1qlgen:
   -bucket string
-        bucket with travel-sample data (default "default")
+    	bucket with travel-sample data (default "travel-sample")
   -cluster string
-        name of couchbase cluster resource (default "cb-example")
+    	name of couchbase cluster resource (default "cb-example")
   -concurrency int
-        number of concurrent requests (default 5)
+    	number of concurrent requests (default 5)
   -duration int
-        time to apply load (in seconds) (default 60)
+    	time to apply load (in seconds) (default 60)
   -namespace string
-        namespace/domain of couchbase cluster resource (default "default")
+    	namespace of couchbase cluster resource (default "default")
   -password string
-        password for bucket user
+    	password for bucket user (default "password")
+  -seed int
+    	seed determining query randomness (default 1234)
 ```
 
 ## Kubernetes
