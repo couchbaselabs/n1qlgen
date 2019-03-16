@@ -35,7 +35,7 @@ func NewN1qlGen(clusterName, namespace, bucketName, password string) (*N1qlGen, 
 		return nil, fmt.Errorf("Open bucket error: %v", err)
 	}
 
-	queries := []Generator{NewRouteQueryGenerator(), NewHotelQueryGenerator()}
+	queries := []Generator{NewRouteQueryGenerator(), NewHotelRatingGenerator(), NewHotelReviewGenerator()}
 	return &N1qlGen{cluster, bucket, queries}, nil
 }
 

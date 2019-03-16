@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 )
 
 // RouteQueryGenerator generates queries on route docs with pseudo random source airport
@@ -25,25 +24,25 @@ func (g *RouteQueryGenerator) query() string {
 		"FROM `travel-sample` " +
 		"WHERE type = 'route' and sourceairport = '%s'"
 	g.seed += 1
-	return fmt.Sprintf(qstr, g.airports[rand.Intn(g.seed)%len(g.airports)])
+	return fmt.Sprintf(qstr, pickOne(g.airports, g.seed))
 }
 
-// HotelQueryGenerator generates queries on hotel docs
+// HotelRatingQueryGenerator generates queries on ratings of hotels
 // from random cities with limit between 0 and 20
-type HotelQueryGenerator struct {
+type HotelRatingGenerator struct {
 	cities []string
 	seed   int
 }
 
-func NewHotelQueryGenerator() *HotelQueryGenerator {
+func NewHotelRatingGenerator() *HotelRatingGenerator {
 	cites := []string{"Medway", "Gillingham", "Giverny", "Giverny", "Glasgow", "Highland",
 		"Glossop", "Padfield", "Glossop", "Glossop", "Santa Barbara",
 		"Swansea", "Llanrhidian", "Swansea", "Preaux", "Greenhead",
 		"Northumberland", "Northumberland", "Half Moon Bay"}
-	return &HotelQueryGenerator{cities: cites, seed: 0}
+	return &HotelRatingGenerator{cities: cites, seed: 0}
 }
 
-func (g *HotelQueryGenerator) query() string {
+func (g *HotelRatingGenerator) query() string {
 	qstr := "SELECT name, (SELECT raw avg(s.ratings.Overall) " +
 		"FROM   t.reviews  as s)[0] AS overall_avg_rating " +
 		"FROM   `travel-sample` AS t " +
@@ -51,5 +50,36 @@ func (g *HotelQueryGenerator) query() string {
 		"ORDER BY overall_avg_rating DESC " +
 		"LIMIT %d; "
 	g.seed += 1
-	return fmt.Sprintf(qstr, g.cities[rand.Intn(g.seed)%len(g.cities)], rand.Intn(g.seed)%20)
+	return fmt.Sprintf(qstr, pickOne(g.cities, g.seed), limitGen(g.seed))
+}
+
+// HotelReviewQueryGenerator generates queries on reviews
+// of random hotels with limit between 0 and 20
+type HotelReviewGenerator struct {
+	hotels []string
+	seed   int
+}
+
+func NewHotelReviewGenerator() *HotelReviewGenerator {
+
+	hotels := []string{"Medway Youth Hostel", "The Balmoral Guesthouse", "The Robins",
+		"Le Clos Fleuri", "Glasgow Grand Central", "Glencoe Youth Hostel",
+		"The George Hotel", "Windy Harbour Farm Hotel", "Avondale Guest House",
+		"The Bulls Head", "Bacara Resort & Spa", "Rhossili Bunkhouse",
+		"Hill House Holiday Cottage", "Number 38 The Gower", "La Pradella",
+		"The Greenhead Hotel and Hostel", "Once Brewed YHA Hostel"}
+	return &HotelReviewGenerator{hotels: hotels, seed: 0}
+}
+
+func (g *HotelReviewGenerator) query() string {
+	qstr := "SELECT name, cnt_reviewers " +
+		"FROM   `travel-sample` AS t " +
+		"LET cnt_reviewers = (SELECT raw count(*) " +
+		"FROM t.reviews AS s " +
+		"WHERE s.ratings.Overall >= 4)[0] " +
+		"WHERE type = 'hotel' and name = '%s' " +
+		"ORDER BY cnt_reviewers DESC " +
+		"LIMIT %d;"
+	g.seed += 1
+	return fmt.Sprintf(qstr, pickOne(g.hotels, g.seed), limitGen(g.seed))
 }
