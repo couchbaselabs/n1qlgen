@@ -7,7 +7,6 @@ import (
 
 	"github.com/couchbase/gocb"
 )
-
 type N1qlGen struct {
 	cluster    *gocb.Cluster
 	bucket     *gocb.Bucket
@@ -16,15 +15,15 @@ type N1qlGen struct {
 
 type Generator interface {
 	query() string
+	name()  string
 }
 
 func NewN1qlGen(clusterName, namespace, bucketName, password string) (*N1qlGen, error) {
-
 	// TODO: assumingly using first Pod here which is always 0000
 	// we could allow for full endpoint override or use
 	// kube api to get service endpoints
 	clusterUrl := fmt.Sprintf("couchbase://%s-0000.%s.%s.svc", clusterName, clusterName, namespace)
-	fmt.Println(clusterUrl)
+        logInfo("connect",  clusterUrl)
 	cluster, err := gocb.Connect(clusterUrl)
 	if err != nil {
 		return nil, fmt.Errorf("Connection error: %v", err)
@@ -58,12 +57,15 @@ func (ng *N1qlGen) runQueries(seed int) {
 		seed += 1
 		gen := ng.generators[rand.Intn(seed)%len(ng.generators)]
 		query := gen.query()
-		fmt.Println(query)
+
+		// log
+		logDebug(gen.name(), query)
 
 		// execute query
 		rows, err := ng.bucket.ExecuteN1qlQuery(gocb.NewN1qlQuery(query), nil)
 		if err = rows.Close(); err != nil {
-			fmt.Printf("Couldn't get all the rows: %s\n", err)
+			msg := fmt.Sprintf("Couldn't get all the rows: %s\n", err)
+                        logWarn(gen.name(), msg)
 		}
 	}
 }

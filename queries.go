@@ -27,7 +27,11 @@ func (g *RouteQueryGenerator) query() string {
 	return fmt.Sprintf(qstr, pickOne(g.airports, g.seed))
 }
 
-// HotelRatingQueryGenerator generates queries on ratings of hotels
+func (g *RouteQueryGenerator) name() string {
+  return "RouteQueryGenerator"
+}
+
+// HotelRatingGenerator generates queries on ratings of hotels
 // from random cities with limit between 0 and 20
 type HotelRatingGenerator struct {
 	cities []string
@@ -53,7 +57,11 @@ func (g *HotelRatingGenerator) query() string {
 	return fmt.Sprintf(qstr, pickOne(g.cities, g.seed), limitGen(g.seed))
 }
 
-// HotelReviewQueryGenerator generates queries on reviews
+func (g *HotelRatingGenerator) name() string {
+  return "HotelRatingGenerator"
+}
+
+// HotelReviewGenerator generates queries on reviews
 // of random hotels with limit between 0 and 20
 type HotelReviewGenerator struct {
 	hotels []string
@@ -82,4 +90,8 @@ func (g *HotelReviewGenerator) query() string {
 		"LIMIT %d;"
 	g.seed += 1
 	return fmt.Sprintf(qstr, pickOne(g.hotels, g.seed), limitGen(g.seed))
+}
+
+func (g *HotelReviewGenerator) name() string {
+  return "HotelReviewGenerator"
 }
