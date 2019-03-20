@@ -2,6 +2,8 @@
 N1gl load generator for use travel-sample data
 
 ```bash
+go get github.com/couchbaselabs/n1qlgen
+cd $GOPATH/n1qlgen/
 go build
 ./n1qlgen -cluster mycluster -bucket travel-sample -password password
 ```
@@ -17,8 +19,10 @@ Usage of ./n1qlgen:
     	number of concurrent requests (default 5)
   -duration int
     	time to apply load (in seconds) (default 60)
+  -log-level string
+    	log level [debug, info, warn] (default "info")
   -namespace string
-    	namespace of couchbase cluster resource (default "default")
+    	namespace/domain of couchbase cluster resource (default "default")
   -password string
     	password for bucket user (default "password")
   -seed int
@@ -48,15 +52,14 @@ For manual cluster creation refer [Couchbase Operator deployment documentation.]
 ### Run query generator
 The following jobs can be run to load travel-sample data into a kuberentes cluster and run the query generator.
 ```bash
-cd kubernetes
 
 # create bucket user and check Couchbase Web Console -> Security for user named 'travel-sample'
-kubectl create -f user-secret.yaml
-kubectl create -f user-create.yaml
+kubectl create -f kubernetes/user-secret.yaml
+kubectl create -f kubernetes/user-create.yaml
 
 # load travel-sample data and check Couchbase Web Console -> Buckets (travel-sample) -> statistics
-kubectl create -f data-load.yaml
+kubectl create -f kubernetes/data-load.yaml
 
 # run n1ql gen and check Couchbase Web Console -> Buckets (travel-sample)  -> statistics -> Query
-kubectl create -f n1qlgen-run.yaml
+kubectl create -f kubernetes/n1qlgen-run.yaml
 ```
